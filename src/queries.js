@@ -14,6 +14,7 @@ function SelectCollection(req, res, next, whereIN){
     "recaudaciones.id_alum, " + 
     "recaudaciones.numero as recibo, " + 
     "recaudaciones.id_rec, " +
+    "recaudaciones.id_registro, " +
     "recaudaciones.importe, " +
     "recaudaciones.fecha, " +
     "recaudaciones.id_ubicacion, " + 

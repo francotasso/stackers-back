@@ -10,7 +10,7 @@ function SelectCollection(req, res, next, whereIN){
     "SELECT " +      
     "alumno_programa.dni_m AS dni, " +
     "concepto.concepto as concepto, " +
-    "concepto.descripcion, " +
+    "concepto.descripcion_min, " +
     "recaudaciones.id_alum, " + 
     "recaudaciones.numero as recibo, " + 
     "recaudaciones.id_rec, " +

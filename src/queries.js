@@ -71,6 +71,8 @@ function SelectGeneral(req, res, next, table){
     if (table === "concepto")
         query = query +" JOIN clase_pagos ON concepto.id_clase_pagos = clase_pagos.id_clase_pagos "+
         "where clase_pagos.id_clase_pagos = 2";
+    else if(table === "ubicacion")
+        query = query + " order by 1;"
 
     db.any(query)
         .then(function(data){
@@ -195,7 +197,439 @@ function InsertQuery(req, res, next, valores){
         })
 }
 
+
+//Nuevas queries
+function selectDatosAlumno(req, res, next, numRecibo) {
+ 
+    let query = `SELECT r.id_alum,r.numero as numero_recibo, r.cod_alumno, ap.ape_paterno, ap.ape_materno, ap.nom_alumno 
+    FROM alumno_programa ap 
+    INNER JOIN recaudaciones r
+    ON ap.cod_alumno = r.cod_alumno WHERE r.numero ='${numRecibo}'`;
+    console.log(query);
+    db.any(query)
+        .then(function(data) {
+            res.status(200)
+                .json({
+                    status: 'success',
+                    data: data,
+                    message: 'Retrieved List'
+                });
+        })
+        .catch(function(err) {
+            return next(err);
+        });
+    }
+
+    function getProgramas(req, res, next) {
+ 
+        let query = `SELECT id_programa, sigla_programa,nom_programa FROM programa`;
+        console.log(query);
+        db.any(query)
+            .then(function(data) {
+                res.status(200)
+                    .json({
+                        status: 'success',
+                        data: data,
+                        message: 'Retrieved List'
+                    });
+            })
+            .catch(function(err) {
+                return next(err);
+            });
+        }
+
+
+//-> Desasignar 2 --> Solo desasigna con el numero de recibo
+function desasignarReciboAlumno(req, res, next, values) {
+    //console.log(valores);
+    let query = `UPDATE recaudaciones 
+    SET cod_alumno = null, 
+    id_programa = null 
+    WHERE numero ='${values}'`;
+
+    console.log(query);
+    db.any(query)
+        .then(function(data) {
+            res.status(200)
+                .json({
+                    status: 'success',
+                    data: data,
+                    message: 'Retrieved List'
+                });
+        })
+        .catch(function(err) {
+            res.status(500)
+                .json({
+                    status: 'error',
+                    message: err.stack
+                });
+        })
+}
+
+//-> Asignar con Codigo, DNI, Nombre, Apellido paterno, apellido materno
+function asignarAlumnoPrograma_Nombre_AppPaterno_AppMaterno(req, res, next, nombre, app_pat, app_mat){
+    let query = `SELECT CONCAT(alumno_programa.cod_alumno,'/',alumno_programa.id_programa) as
+    ids,alumno_programa.cod_alumno, 
+    alumno_programa.id_programa, 
+    CONCAT(alumno_programa.cod_alumno,' / ', 
+           alumno_programa.nom_alumno, ' ', 
+           alumno_programa.ape_paterno, ' ', 
+           alumno_programa.ape_materno, ' / ', 
+           programa.sigla_programa) as Campos_para_asignar 
+    FROM 
+    alumno_programa 
+    INNER JOIN programa 
+    ON alumno_programa.id_programa = programa.id_programa 
+    WHERE 
+    alumno_programa.nom_alumno = '${nombre}' AND 
+    alumno_programa.ape_paterno = '${app_pat}' AND
+    alumno_programa.ape_materno = '${app_mat}'`;
+    
+    console.log(query);
+    db.any(query)
+        .then(function(data) {
+            res.status(200)
+                .json({
+                    status: 'success',
+                    data: data,
+                    message: 'Retrieved List'
+                });
+        })
+        .catch(function(err) {
+            res.status(500)
+                .json({
+                    status: 'error',
+                    message: err.stack
+                });
+        })
+}
+
+function asignarAlumnoPrograma_Nombre_AppPaterno(req, res, next, nombre, app_pat){
+    let query = `SELECT CONCAT(alumno_programa.cod_alumno,'/',alumno_programa.id_programa) as
+    ids,alumno_programa.cod_alumno, 
+    alumno_programa.id_programa, 
+    CONCAT(alumno_programa.cod_alumno,' / ', 
+           alumno_programa.nom_alumno, ' ', 
+           alumno_programa.ape_paterno, ' ', 
+           alumno_programa.ape_materno, ' / ', 
+           programa.sigla_programa) as Campos_para_asignar 
+    FROM 
+    alumno_programa 
+    INNER JOIN programa 
+    ON alumno_programa.id_programa = programa.id_programa 
+    WHERE 
+    alumno_programa.nom_alumno = '${nombre}' AND 
+    alumno_programa.ape_paterno = '${app_pat}' `;
+    
+    console.log(query);
+    db.any(query)
+        .then(function(data) {
+            res.status(200)
+                .json({
+                    status: 'success',
+                    data: data,
+                    message: 'Retrieved List'
+                });
+        })
+        .catch(function(err) {
+            res.status(500)
+                .json({
+                    status: 'error',
+                    message: err.stack
+                });
+        })
+}
+
+function asignarAlumnoPrograma_Nombre_AppMaterno(req, res, next, nombre, app_mat){
+    let query = `SELECT CONCAT(alumno_programa.cod_alumno,'/',alumno_programa.id_programa) as
+    ids,alumno_programa.cod_alumno, 
+    alumno_programa.id_programa, 
+    CONCAT(alumno_programa.cod_alumno,' / ', 
+           alumno_programa.nom_alumno, ' ', 
+           alumno_programa.ape_paterno, ' ', 
+           alumno_programa.ape_materno, ' / ', 
+           programa.sigla_programa) as Campos_para_asignar 
+    FROM 
+    alumno_programa 
+    INNER JOIN programa 
+    ON alumno_programa.id_programa = programa.id_programa 
+    WHERE 
+    alumno_programa.nom_alumno = '${nombre}' AND 
+    alumno_programa.ape_materno = '${app_mat}' `;
+    
+    console.log(query);
+    db.any(query)
+        .then(function(data) {
+            res.status(200)
+                .json({
+                    status: 'success',
+                    data: data,
+                    message: 'Retrieved List'
+                });
+        })
+        .catch(function(err) {
+            res.status(500)
+                .json({
+                    status: 'error',
+                    message: err.stack
+                });
+        })
+    
+}
+
+function asignarAlumnoPrograma_AppPaterno_AppMaterno(req, res, next, app_pat, app_mat){
+    let query = `SELECT CONCAT(alumno_programa.cod_alumno,'/',alumno_programa.id_programa) as
+    ids,alumno_programa.cod_alumno, 
+    alumno_programa.id_programa, 
+    CONCAT(alumno_programa.cod_alumno,' / ', 
+           alumno_programa.nom_alumno, ' ', 
+           alumno_programa.ape_paterno, ' ', 
+           alumno_programa.ape_materno, ' / ', 
+           programa.sigla_programa) as Campos_para_asignar 
+    FROM 
+    alumno_programa 
+    INNER JOIN programa 
+    ON alumno_programa.id_programa = programa.id_programa 
+    WHERE 
+    alumno_programa.ape_paterno = '${app_pat}' AND 
+    alumno_programa.ape_materno = '${app_mat}' `;
+    
+    console.log(query);
+    db.any(query)
+        .then(function(data) {
+            res.status(200)
+                .json({
+                    status: 'success',
+                    data: data,
+                    message: 'Retrieved List'
+                });
+        })
+        .catch(function(err) {
+            res.status(500)
+                .json({
+                    status: 'error',
+                    message: err.stack
+                });
+        })
+}
+
+function asignarAlumnoPrograma_Nombre(req, res, next, nombre){
+    let query = `SELECT CONCAT(alumno_programa.cod_alumno,'/',alumno_programa.id_programa) as
+    ids,alumno_programa.cod_alumno, 
+    alumno_programa.id_programa, 
+    CONCAT(alumno_programa.cod_alumno,' / ', 
+           alumno_programa.nom_alumno, ' ', 
+           alumno_programa.ape_paterno, ' ', 
+           alumno_programa.ape_materno, ' / ', 
+           programa.sigla_programa) as Campos_para_asignar 
+    FROM 
+    alumno_programa 
+    INNER JOIN programa 
+    ON alumno_programa.id_programa = programa.id_programa 
+    WHERE 
+    alumno_programa.nom_alumno LIKE '%${nombre}' OR 
+    alumno_programa.nom_alumno LIKE '${nombre}%'`;
+    
+    console.log(query);
+    db.any(query)
+        .then(function(data) {
+            res.status(200)
+                .json({
+                    status: 'success',
+                    data: data,
+                    message: 'Retrieved List'
+                });
+        })
+        .catch(function(err) {
+            res.status(500)
+                .json({
+                    status: 'error',
+                    message: err.stack
+                });
+        })
+}
+
+function asignarAlumnoPrograma_codigo(req, res, next, codigo){
+    let query = `SELECT CONCAT(alumno_programa.cod_alumno,'/',alumno_programa.id_programa) as
+    ids,alumno_programa.cod_alumno, 
+    alumno_programa.id_programa, 
+    CONCAT(alumno_programa.cod_alumno,' / ', 
+           alumno_programa.nom_alumno, ' ', 
+           alumno_programa.ape_paterno, ' ', 
+           alumno_programa.ape_materno, ' / ', 
+           programa.sigla_programa) as Campos_para_asignar 
+    FROM 
+    alumno_programa 
+    INNER JOIN programa 
+    ON alumno_programa.id_programa = programa.id_programa 
+    WHERE 
+    alumno_programa.cod_alumno = '${codigo}'`;
+    
+    console.log(query);
+    db.any(query)
+        .then(function(data) {
+            res.status(200)
+                .json({
+                    status: 'success',
+                    data: data,
+                    message: 'Retrieved List'
+                });
+        })
+        .catch(function(err) {
+            res.status(500)
+                .json({
+                    status: 'error',
+                    message: err.stack
+                });
+        })
+}
+
+function asignarAlumnoPrograma_dni(req, res, next, dni){
+    let query = `SELECT CONCAT(alumno_programa.cod_alumno,'/',alumno_programa.id_programa) as
+    ids,alumno_programa.cod_alumno, 
+    alumno_programa.id_programa, 
+    CONCAT(alumno_programa.cod_alumno,' / ', 
+           alumno_programa.nom_alumno, ' ', 
+           alumno_programa.ape_paterno, ' ', 
+           alumno_programa.ape_materno, ' / ', 
+           programa.sigla_programa) as Campos_para_asignar 
+    FROM 
+    alumno_programa 
+    INNER JOIN programa 
+    ON alumno_programa.id_programa = programa.id_programa 
+    WHERE 
+    alumno_programa.dni_m = '${dni}'`;
+    
+    console.log(query);
+    db.any(query)
+        .then(function(data) {
+            res.status(200)
+                .json({
+                    status: 'success',
+                    data: data,
+                    message: 'Retrieved List'
+                });
+        })
+        .catch(function(err) {
+            res.status(500)
+                .json({
+                    status: 'error',
+                    message: err.stack
+                });
+        })
+}
+
+function asignarCodigoAlumnoIdPrograma(req, res, next, cod_alumno, id_programa, numero_recibo){
+    let query = `UPDATE recaudaciones SET cod_alumno = '${cod_alumno}', id_programa = ${id_programa} WHERE numero = '${numero_recibo}'`;
+    
+    console.log(query);
+    db.any(query)
+        .then(function(data) {
+            res.status(200)
+                .json({
+                    status: 'success',
+                    data: data,
+                    message: 'Retrieved List'
+                });
+        })
+        .catch(function(err) {
+            res.status(500)
+                .json({
+                    status: 'error',
+                    message: err.stack
+                });
+        })
+}
+
+function asignarAlumnoPrograma_AppPaterno(req, res, next, app_pat){
+    let query = `SELECT CONCAT(alumno_programa.cod_alumno,'/',alumno_programa.id_programa) as
+    ids,alumno_programa.cod_alumno, 
+    alumno_programa.id_programa, 
+    CONCAT(alumno_programa.cod_alumno,' / ', 
+           alumno_programa.nom_alumno, ' ', 
+           alumno_programa.ape_paterno, ' ', 
+           alumno_programa.ape_materno, ' / ', 
+           programa.sigla_programa) as Campos_para_asignar 
+    FROM 
+    alumno_programa 
+    INNER JOIN programa 
+    ON alumno_programa.id_programa = programa.id_programa 
+    WHERE 
+    alumno_programa.ape_paterno = '${app_pat}'`;
+    
+    console.log(query);
+    db.any(query)
+        .then(function(data) {
+            res.status(200)
+                .json({
+                    status: 'success',
+                    data: data,
+                    message: 'Retrieved List'
+                });
+        })
+        .catch(function(err) {
+            res.status(500)
+                .json({
+                    status: 'error',
+                    message: err.stack
+                });
+        })
+}
+
+function asignarAlumnoPrograma_AppMaterno(req, res, next, app_mat){
+    let query = `SELECT CONCAT(alumno_programa.cod_alumno,'/',alumno_programa.id_programa) as
+    ids,alumno_programa.cod_alumno, 
+    alumno_programa.id_programa, 
+    CONCAT(alumno_programa.cod_alumno,' / ', 
+           alumno_programa.nom_alumno, ' ', 
+           alumno_programa.ape_paterno, ' ', 
+           alumno_programa.ape_materno, ' / ', 
+           programa.sigla_programa) as Campos_para_asignar 
+    FROM 
+    alumno_programa 
+    INNER JOIN programa 
+    ON alumno_programa.id_programa = programa.id_programa 
+    WHERE 
+    alumno_programa.ape_materno = '${app_mat}'`;
+    
+    console.log(query);
+    db.any(query)
+        .then(function(data) {
+            res.status(200)
+                .json({
+                    status: 'success',
+                    data: data,
+                    message: 'Retrieved List'
+                });
+        })
+        .catch(function(err) {
+            res.status(500)
+                .json({
+                    status: 'error',
+                    message: err.stack
+                });
+        })
+}
+
+
 module.exports = {
+    //Inicio Modificación
+    selectDatosAlumno,
+    getProgramas,
+    
+    desasignarReciboAlumno,
+    asignarAlumnoPrograma_Nombre_AppPaterno_AppMaterno,
+    asignarAlumnoPrograma_Nombre_AppPaterno,
+    asignarAlumnoPrograma_Nombre_AppMaterno,
+    asignarAlumnoPrograma_AppPaterno_AppMaterno,
+    asignarAlumnoPrograma_AppPaterno,
+    asignarAlumnoPrograma_AppMaterno,
+    asignarAlumnoPrograma_Nombre,
+    asignarAlumnoPrograma_codigo,
+    asignarAlumnoPrograma_dni,
+    asignarCodigoAlumnoIdPrograma,
+    //Fin Modificación
+
     SelectGeneral:SelectGeneral,
     SelectCollection:SelectCollection,
     UpdateObservation:UpdateObservation,

@@ -47,4 +47,14 @@ router.get('/ubicaciones', algrmts.getAllUbications);
 /* GET Obtener recibo */
 router.get('/recibo/:id', algrmts.getReceipt);
 
+//Inicio Nuevas rutas
+router.get('/alumnos/:id', algrmts.getDataAlumno);
+router.get('/programas', algrmts.getDataProgramas);;
+
+router.post('/desasignarRecibo', algrmts.fnDesasignarReciboAlumno);
+router.post('/asignacionesDisponibles', algrmts.fnGetSiglaCodigoDisponibles);
+router.post('/asignarCodigoPrograma', algrmts.fnAsignarCodigoAlumnoIdPrograma);
+//Fin nuevas rutas
+
+
 module.exports = router;

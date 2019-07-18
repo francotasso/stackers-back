@@ -500,7 +500,83 @@ function sumarDias(fecha, dias) {
     fecha.setDate(fecha.getDate() + dias);
     return fecha;
 }
+
+//Inicio Cambios
+function getDataAlumno(req, res, next) {
+    let numRecibo = req.params.id;
+    console.log(numRecibo);
+    q.selectDatosAlumno(req, res, next, numRecibo);
+}
+
+function getDataProgramas(req, res, next) {
+    q.getProgramas(req, res, next);
+}
+
+function fnGetSiglaCodigoDisponibles(req, res, next){
+    //Caso de que se tienen nombre(s), app_pat y app_mat
+    let data = req.body;
+    let nombre = data.nombre;
+    let app_pat = data.app_pat;
+    let app_mat = data.app_mat;
+    let codigo = data.codigo;
+    let dni = data.dni;
+
+    console.log(nombre,"---",nombre.length ,"---",app_pat, app_mat, codigo, dni,"<---");
+    
+    if(nombre.length != 0 && app_pat.length != 0 && app_mat.length != 0){
+        q.asignarAlumnoPrograma_Nombre_AppPaterno_AppMaterno(req, res, next, nombre, app_pat, app_mat);
+    } else if(nombre.length != 0 && app_pat.length != 0){
+        q.asignarAlumnoPrograma_Nombre_AppPaterno(req, res, next, nombre, app_pat);
+    } else if(nombre.length != 0 && app_mat.length != 0){
+        q.asignarAlumnoPrograma_Nombre_AppMaterno(req, res, next, nombre, app_mat);
+    }else if(app_pat.length != 0 && app_mat.length != 0){
+        q.asignarAlumnoPrograma_AppPaterno_AppMaterno(req, res, next, app_pat, app_mat);
+    }else if(app_pat.length != 0){
+        q.asignarAlumnoPrograma_AppPaterno(req, res, next, app_pat);
+    }else if(app_mat.length != 0){
+        q.asignarAlumnoPrograma_AppMaterno(req, res, next, app_mat);
+    }else if(nombre.length != 0){
+        q.asignarAlumnoPrograma_Nombre(req, res, next, nombre);
+    }else if(codigo.length != 0){
+        q.asignarAlumnoPrograma_codigo(req, res, next, codigo);
+    }else if(dni.length != 0){
+        q.asignarAlumnoPrograma_dni(req, res, next, dni);
+    }
+}
+
+function fnAsignarCodigoAlumnoIdPrograma(req, res, next) {
+    let data = req.body;
+    let cod_alumno = data.cod_alumno;
+    let id_programa = data.id_programa;
+    let numero_recibo = data.numero_recibo;
+    
+    q.asignarCodigoAlumnoIdPrograma(req, res, next, cod_alumno, id_programa, numero_recibo);
+
+}
+
+
+
+function fnDesasignarReciboAlumno(req, res, next) {
+    let data = req.body;
+    let values =data.numRecibo;
+
+    console.log(values);
+
+    q.desasignarReciboAlumno(req, res, next, values);
+}
+
+
+
 module.exports = {
+    //Nuevosa llamados
+    getDataAlumno,
+    getDataProgramas,
+
+    fnDesasignarReciboAlumno,
+    fnGetSiglaCodigoDisponibles,
+    fnAsignarCodigoAlumnoIdPrograma,
+    //Fin nuevo llamados
+
     getAll: getAll,
     getComplet: getComplet,
     validate: validate,
